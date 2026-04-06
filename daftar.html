@@ -71,6 +71,23 @@ button:disabled{
   font-size:13px;
   color:#555;
 }
+
+/* TAMBAHAN (tidak ganggu tampilan utama) */
+.drive-link{
+  margin-top:10px;
+  display:none;
+}
+
+.drive-link a{
+  display:block;
+  background:#28a745;
+  color:#fff;
+  text-align:center;
+  padding:10px;
+  border-radius:6px;
+  text-decoration:none;
+  margin-top:8px;
+}
 </style>
 </head>
 
@@ -115,6 +132,11 @@ button:disabled{
     <label>Berkas Pendukung</label>
     <input type="text" id="berkas" readonly>
 
+    <!-- LINK GOOGLE DRIVE -->
+    <div class="drive-link" id="driveLink">
+      <a id="linkDrive" href="#" target="_blank">Upload Berkas</a>
+    </div>
+
     <button type="submit">Kirim Pendaftaran</button>
     <div class="note">*Tanggal mengikuti jadwal yang dipilih dan tidak dapat diubah</div>
 
@@ -123,11 +145,8 @@ button:disabled{
 </div>
 
 <script>
-/* =============================
-   AMBIL TANGGAL DARI JADWAL
-============================= */
 const params = new URLSearchParams(window.location.search);
-const tanggal = params.get("tanggal"); // format: 2026-04-01
+const tanggal = params.get("tanggal");
 
 if(!tanggal){
   alert("Tanggal tidak valid");
@@ -136,9 +155,6 @@ if(!tanggal){
 
 document.getElementById("tanggalBAP").value = tanggal;
 
-/* =============================
-   CEK KUOTA (ADMIN)
-============================= */
 let kuota = JSON.parse(localStorage.getItem("kuotaBAP")) || {};
 
 if(kuota[tanggal] === "penuh"){
@@ -146,25 +162,37 @@ if(kuota[tanggal] === "penuh"){
   window.location.href = "jadwal.html";
 }
 
-/* =============================
-   BERKAS OTOMATIS
-============================= */
 const jenis = document.getElementById("jenisPermohonan");
 const berkas = document.getElementById("berkas");
+const driveLink = document.getElementById("driveLink");
+const linkDrive = document.getElementById("linkDrive");
 
 jenis.addEventListener("change", ()=>{
-  if(jenis.value === "hilang" || jenis.value === "rusak"){
+  driveLink.style.display="none";
+
+  if(jenis.value === "hilang"){
     berkas.value = "Ijazah / Buku Nikah";
-  } else if(jenis.value === "perubahan"){
+    driveLink.style.display="block";
+    linkDrive.href = "https://docs.google.com/forms/d/e/1FAIpQLSd4gYGJRgE5vdWmN39rkRKxjNE_5Js7Xi2bfo5XNOPg2pgY6w/viewform";
+    linkDrive.innerText = "Upload Berkas Paspor Hilang";
+  } 
+  else if(jenis.value === "rusak"){
+    berkas.value = "Ijazah / Buku Nikah";
+    driveLink.style.display="block";
+    linkDrive.href = "https://docs.google.com/forms/d/e/1FAIpQLSewTDJgOyGhX2_LU6RjmfHwJ-G4JRFktx4D5WbV_KN8wChhEw/viewform";
+    linkDrive.innerText = "Upload Berkas Paspor Rusak";
+  } 
+  else if(jenis.value === "perubahan"){
     berkas.value = "Surat Putusan Pengadilan, Ijazah, Buku Nikah";
-  } else {
+    driveLink.style.display="block";
+    linkDrive.href = "https://docs.google.com/forms/d/e/1FAIpQLSfl73xC6mB15Sc1nLyDmESUa2_sS7dNyb8IRPSIr3wQz7ARZA/viewform";
+    linkDrive.innerText = "Upload Berkas Perubahan Data";
+  } 
+  else {
     berkas.value = "";
   }
 });
 
-/* =============================
-   SUBMIT → KURANGI KUOTA
-============================= */
 document.getElementById("formDaftar").addEventListener("submit", function(e){
   e.preventDefault();
 
@@ -178,4 +206,3 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
 
 </body>
 </html>
-
